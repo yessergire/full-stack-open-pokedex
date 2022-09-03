@@ -35,5 +35,5 @@ jobs:
           heroku_email: "yessergire.mohamed@outlook.com"
           healthcheck: "pokelol.herokuapp.com/health"
           checkstring: "ok"
-          delay: 5
+          delay: 90
           rollbackonhealthcheckfailed: true
