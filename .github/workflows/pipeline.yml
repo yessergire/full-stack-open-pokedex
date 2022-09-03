@@ -33,3 +33,6 @@ jobs:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: "pokelol"
           heroku_email: "yessergire.mohamed@outlook.com"
+          healthcheck: "pokelol.herokuapp.com/health"
+          checkstring: "ok"
+          delay: 5
