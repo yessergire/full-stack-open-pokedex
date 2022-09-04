@@ -5,7 +5,7 @@ on:
     branches:
       - master
   pull_request:
-    branches: [master]
+    branches: [master, combine-jobs]
     types: [opened, synchronize]
 
 jobs:
@@ -13,6 +13,18 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
+      - name: github context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - name: commits
+        env:
+          COMMITS: ${{ toJson(github.event.commits) }}
+        run: echo "$COMMITS"
+      - name: commit messages
+        env:
+          COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
+        run: echo "$COMMIT_MESSAGES"
       - name: install node
         uses: actions/setup-node@v2
         with:
@@ -41,3 +53,19 @@ jobs:
           checkstring: "ok"
           delay: 90
           rollbackonhealthcheckfailed: true
+
+  tag_release:
+    needs: [simple_deployment_pipeline]
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+      - name: Bump version and push tag
+        uses: anothrNick/github-tag-action@1.36.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+          DEFAULT_BUMP: patch
+          DRY_RUN: true
+
