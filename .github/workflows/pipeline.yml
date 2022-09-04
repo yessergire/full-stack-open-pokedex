@@ -16,7 +16,7 @@ jobs:
       - name: print commit info
         env:
           COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
-          COMMIT_MESSAGES_STR: ${{ toJson(join(github.event.commits.*.message), ',') }}
+          COMMIT_MESSAGES_STR: ${{ toJson(join(github.event.commits.*.message)) }}
           COMMIT_MESSAGES_CONTAINS_SKIP: ${{ contains('#skip', join(github.event.commits.*.message)) }}
         run: |
           echo $COMMIT_MESSAGES
