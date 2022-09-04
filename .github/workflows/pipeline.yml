@@ -6,14 +6,15 @@ on:
       - master
   pull_request:
     branches: [master]
-    types: [opened, reopened, synchronize]
+    types: [opened, synchronize]
 
 jobs:
-  simple_deployment_pipeline:
+  build_and_test:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v2
+      - name: install node
+        uses: actions/setup-node@v2
         with:
           node-version: '16'
       - name: npm install
@@ -24,13 +25,19 @@ jobs:
         run: npm run build
       - name: test
         run: npm run test
-      - name: e2e tests
-        uses: cypress-io/github-action@v4
-        with:
-          start: npm run start-prod
-          wait-on: http://localhost:5000
-      - name: Deploy to Heroku
-        uses: akhileshns/heroku-deploy@v3.12.12
+      # - name: e2e tests
+      #  uses: cypress-io/github-action@v4
+      #  with:
+      #    start: npm run start-prod
+      #    wait-on: http://localhost:5000
+
+  deploy_to_heroku:
+    runs-on: ubuntu-20.04
+    needs: build_and_test
+    if: ${{ github.event_name == 'push' }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: "pokelol"
