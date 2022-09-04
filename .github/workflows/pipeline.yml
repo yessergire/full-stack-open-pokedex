@@ -9,7 +9,7 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  setup:
+  default_pipeline:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -19,20 +19,10 @@ jobs:
           node-version: '16'
       - name: npm install
         run: npm install
-
-  build:
-    runs-on: ubuntu-20.04
-    needs: setup
-    steps:
       - name: lint
         run: npm run eslint
       - name: build
         run: npm run build
-
-  run-tests:
-    runs-on: ubuntu-20.04
-    needs: build
-    steps:
       - name: test
         run: npm run test
       - name: e2e tests
