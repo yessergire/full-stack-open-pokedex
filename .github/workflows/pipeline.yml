@@ -13,6 +13,16 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
+      - name: print commit info
+        env:
+          COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
+          COMMIT_MESSAGES_STR: ${{ join(toJson(github.event.commits.*.message)) }}
+          COMMIT_MESSAGES_CONTAINS_SKIP: ${{ contains('#skip', join(toJson(github.event.commits.*.message))) }}
+        run: |
+          echo $COMMIT_MESSAGES
+          echo $COMMIT_MESSAGES_STR
+          echo $COMMIT_MESSAGES_CONTAINS_SKIP
+
       - name: install node
         uses: actions/setup-node@v2
         with:
