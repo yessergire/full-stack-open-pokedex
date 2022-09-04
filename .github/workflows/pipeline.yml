@@ -6,14 +6,15 @@ on:
       - master
   pull_request:
     branches: [master]
-    types: [opened, reopened, synchronize]
+    types: [opened, synchronize]
 
 jobs:
-  simple_deployment_pipeline:
+  default_pipeline:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v2
+      - name: install node
+        uses: actions/setup-node@v2
         with:
           node-version: '16'
       - name: npm install
@@ -29,6 +30,12 @@ jobs:
         with:
           start: npm run start-prod
           wait-on: http://localhost:5000
+
+  deploy:
+    runs-on: ubuntu-20.04
+    needs: run-tests
+    steps:
+      - uses: actions/checkout@v3
       - name: Deploy to Heroku
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
