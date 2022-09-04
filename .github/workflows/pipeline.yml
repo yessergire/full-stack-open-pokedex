@@ -6,7 +6,7 @@ on:
       - master
   pull_request:
     branches: [master]
-    types: [opened, synchronize]
+    types: [opened, reopened, synchronize]
 
 jobs:
   default_pipeline:
@@ -33,9 +33,8 @@ jobs:
 
   deploy:
     runs-on: ubuntu-20.04
-    needs: run-tests
+    needs: default_pipeline
     steps:
-      - uses: actions/checkout@v3
       - name: Deploy to Heroku
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
