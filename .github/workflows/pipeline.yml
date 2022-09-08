@@ -15,7 +15,14 @@ on:
     types: [opened, synchronize]
 
 jobs:
+  print_env:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: echo env
+        run: echo commits=${{ env.commits }}; is_skip=${{ env.is_skip }}; is_push=${{ env.is_push }}; 
+
   simple_deployment_pipeline:
+    needs: [print_env]
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
