@@ -20,7 +20,7 @@ on:
 
 jobs:
   print_env:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: is_skip
         run: |
@@ -37,7 +37,7 @@ jobs:
 
   simple_deployment_pipeline:
     needs: [print_env]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - name: install node
@@ -61,7 +61,7 @@ jobs:
       - name: Deploy to Heroku
         # Should deploy if pushed to master branch
         # and commit message does not contain #skip
-        if: ${{ env.can_deploy }} # can_deploy
+        if: ${{ env.can_deploy }}
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
@@ -74,7 +74,7 @@ jobs:
 
   tag_release:
     needs: [simple_deployment_pipeline]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
         with:
