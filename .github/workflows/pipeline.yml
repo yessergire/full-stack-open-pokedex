@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: echo env
         run: |
-          echo commits=${{ env.commits }}; is_skip=${{ env.is_skip }}; is_push=${{ env.is_push }}; can_deploy=${{ !env.is_skip }} && ${{ env.is_push }}; can_tag=${{ env.is_skip }} || ${{ !env.is_push }};
+          echo commits=${{ env.commits }}; is_skip=${{ env.is_skip }}; is_push=${{ env.is_push }}; can_deploy=(${{ !env.is_skip }} && ${{ env.is_push }}); true=(${{ !false }} && ${{ true }}); can_tag=(${{ env.is_skip }} || ${{ !env.is_push }});
 
   simple_deployment_pipeline:
     needs: [print_env]
