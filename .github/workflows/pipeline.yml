@@ -61,7 +61,7 @@ jobs:
       - name: Deploy to Heroku
         # Should deploy if pushed to master branch
         # and commit message does not contain #skip
-        if: ${{ env.can_deploy }}
+        if: env.can_deploy
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
@@ -88,4 +88,4 @@ jobs:
           # Should tag if pushed to master branch
           # and commit message does not contain #skip.
           # Since, this is a negation of can_deploy:
-          DRY_RUN: ${{ env.can_not_tag }}
+          DRY_RUN: env.can_not_tag
