@@ -20,9 +20,9 @@ jobs:
       - name: npm install
         run: npm install
       - name: lint
-        run: npm run eslint
-      - name: build
-        run: npm run build
+        run: npm run lint
+      # - name: build
+      #   run: npm run build
       - name: test
         run: npm run test
       # - name: e2e tests
@@ -30,17 +30,17 @@ jobs:
       #  with:
       #    start: npm run start-prod
       #    wait-on: http://localhost:5000
-      - name: Deploy to Heroku
-        if: ${{ false && github.event_name == 'push' }}
-        uses: akhileshns/heroku-deploy@v3.12.12
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "pokelol"
-          heroku_email: "yessergire.mohamed@outlook.com"
-          healthcheck: "https://pokelol.herokuapp.com/health"
-          checkstring: "ok"
-          delay: 90
-          rollbackonhealthcheckfailed: true
+      # - name: Deploy to Heroku
+      #   if: ${{ github.event_name == 'push' }}
+      #   uses: akhileshns/heroku-deploy@v3.12.12
+      #   with:
+      #     heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+      #     heroku_app_name: "pokelol"
+      #     heroku_email: "yessergire.mohamed@outlook.com"
+      #     healthcheck: "https://pokelol.herokuapp.com/health"
+      #     checkstring: "ok"
+      #     delay: 90
+      #     rollbackonhealthcheckfailed: true
 
   tag_release:
     needs: [simple_deployment_pipeline]
@@ -50,9 +50,10 @@ jobs:
         with:
           fetch-depth: '0'
       - name: Bump version and push tag
-        if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip') }}
+        if: ${{ github.event_name == 'push' }}
         uses: anothrNick/github-tag-action@1.36.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           DEFAULT_BUMP: patch
+          DRY_RUN: ${{ contains(join(github.event.commits.*.message), '#skip') }}
