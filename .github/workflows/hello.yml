@@ -9,6 +9,8 @@ env:
   is_no_push: ${{ github.event_name != 'push' }}
   is_true: true
   is_eval_true: ${{ true }}
+  is_false: false
+  is_eval_false: ${{ false }}
 
 on:
   push:
@@ -40,3 +42,9 @@ jobs:
       - name: is_eval_true
         run: |
           echo ${{env.is_eval_true}} !${{env.is_eval_true}}=${{!env.is_eval_true}}
+      - name: is_false
+        run: |
+          echo ${{env.is_false}} !${{env.is_false}}=${{!env.is_false}}
+      - name: is_eval_false
+        run: |
+          echo ${{env.is_eval_false}} !${{env.is_eval_false}}=${{!env.is_eval_false}}
