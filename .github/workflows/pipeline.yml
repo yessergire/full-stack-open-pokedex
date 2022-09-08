@@ -2,7 +2,10 @@ name: Deployment pipeline
 
 env:
   commits: ${{ join(github.event.commits.*.message) }}
-  skip: ${{ contains(join(github.event.commits.*.message), '#skip') }}
+  is_skip: ${{ contains(join(github.event.commits.*.message), '#skip') }}
+  is_push: ${{ github.event_name == 'push' }}
+  can_deploy: ${{ !env.is_skip && env.is_push }}
+  should_tag: ${{ env.can_deploy }}
 
 on:
   push:
@@ -13,59 +16,51 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  print:
+  simple_deployment_pipeline:
     runs-on: ubuntu-20.04
     steps:
-      - name: print env
-        run: |
-          echo commits ${{ env.commits }}
-          echo must skip ${{ env.skip }}
-
-  # simple_deployment_pipeline:
-  #   runs-on: ubuntu-20.04
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: install node
-  #       uses: actions/setup-node@v2
-  #       with:
-  #         node-version: '16'
-  #     - name: npm install
-  #       run: npm install
-  #     - name: lint
-  #       run: npm run lint
-      # - name: build
-      #   run: npm run build
-  #     - name: test
-  #       run: npm run test
+      - uses: actions/checkout@v3
+      - name: install node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - name: npm install
+        run: npm install
+      - name: lint
+        run: npm run lint
+      - name: build
+        run: npm run build
+      - name: test
+        run: npm run test
+      # # skip this for now since it is too slow
       # - name: e2e tests
-      #  uses: cypress-io/github-action@v4
-      #  with:
-      #    start: npm run start-prod
-      #    wait-on: http://localhost:5000
-      # - name: Deploy to Heroku
-      #   if: ${{ github.event_name == 'push' }}
-      #   uses: akhileshns/heroku-deploy@v3.12.12
+      #   uses: cypress-io/github-action@v4
       #   with:
-      #     heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-      #     heroku_app_name: "pokelol"
-      #     heroku_email: "yessergire.mohamed@outlook.com"
-      #     healthcheck: "https://pokelol.herokuapp.com/health"
-      #     checkstring: "ok"
-      #     delay: 90
-      #     rollbackonhealthcheckfailed: true
+      #     start: npm run start-prod
+      #     wait-on: http://localhost:5000
+      - name: Deploy to Heroku
+        if: ${{ env.can_deploy }}
+        uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "pokelol"
+          heroku_email: "yessergire.mohamed@outlook.com"
+          healthcheck: "https://pokelol.herokuapp.com/health"
+          checkstring: "ok"
+          delay: 90
+          rollbackonhealthcheckfailed: true
 
   tag_release:
-    #needs: [simple_deployment_pipeline]
+    needs: [simple_deployment_pipeline]
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Bump version and push tag
-        if: ${{ github.event_name == 'push' }}
         uses: anothrNick/github-tag-action@1.36.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           DEFAULT_BUMP: patch
-          DRY_RUN: ${{ contains(join(github.event.commits.*.message), '#skip') }}
+          DRY_RUN: ${{ !env.should_tag }}
