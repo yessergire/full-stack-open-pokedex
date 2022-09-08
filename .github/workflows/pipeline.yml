@@ -21,17 +21,13 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: print is_skip
-        run: |
-          echo is_skip=${{env.is_skip}}; !is_skip=${{env.is_no_skip}};
+        run: echo is_skip=${{ env.is_skip }} !is_skip=${{ env.is_no_skip }}
       - name: print is_push
-        run: |
-          echo is_push=${{env.is_push}}; !is_push=${{env.is_no_push}}
+        run: echo is_push=${{ env.is_push }} !is_push=${{ env.is_no_push }}
       - name: print can_deploy
-        run: |
-          echo can_deploy=${{ env.is_no_skip && env.is_push }} # can_tag
+        run: echo can_deploy=${{ env.is_no_skip && env.is_push }}
       - name: print can_tag
-        run: |
-          echo !can_tag=${{ env.is_skip || env.is_no_push }} # !can_tag
+        run: echo !can_tag=${{ env.is_skip || env.is_no_push }}
 
   simple_deployment_pipeline:
     needs: [print_env]
