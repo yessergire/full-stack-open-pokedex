@@ -20,12 +20,12 @@ jobs:
   print_env:
     runs-on: ubuntu-20.04
     steps:
-      - name: is_skip
+      - name: can_deploy
         run: |
-          echo ${{env.is_skip}} !${{env.is_skip}}=${{!env.is_skip}=${{env.is_no_skip}}
-      - name: is_push
+          echo is_skip=${{env.is_skip}}; is_push=${{env.is_no_push}} can_deploy=${{ env.is_no_skip && env.is_push }} # can_tag
+      - name: can_tag
         run: |
-          echo ${{env.is_push}} !${{env.is_push}}=${{!env.is_push}}=${{env.is_no_push}}
+          echo is_skip=${{env.is_skip}}; is_push=${{env.is_no_push}} can_tag=${{ env.is_skip || env.is_no_push }} # can_tag
 
   simple_deployment_pipeline:
     needs: [print_env]
@@ -53,7 +53,7 @@ jobs:
       - name: Deploy to Heroku
         # Should deploy if pushed to master branch
         # and commit message does not contain #skip
-        if: ${{ !env.is_skip && env.is_push }} # can_deploy
+        if: ${{ env.is_no_skip && env.is_push }} # can_deploy
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
@@ -80,4 +80,4 @@ jobs:
           # Should tag if pushed to master branch
           # and commit message does not contain #skip.
           # Since, this is a negation of can_deploy:
-          DRY_RUN: ${{ env.is_skip || !env.is_push }} # can_tag
+          DRY_RUN: ${{ env.is_skip || env.is_no_push }} # can_tag
