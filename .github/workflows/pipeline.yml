@@ -20,12 +20,18 @@ jobs:
   print_env:
     runs-on: ubuntu-20.04
     steps:
-      - name: can_deploy
+      - name: print is_skip
         run: |
-          echo is_skip=${{env.is_skip}}; is_push=${{env.is_no_push}} can_deploy=${{ env.is_no_skip && env.is_push }} # can_tag
-      - name: can_tag
+          echo is_skip=${{env.is_skip}}; !is_skip=${{env.is_no_skip}};
+      - name: print is_push
         run: |
-          echo is_skip=${{env.is_skip}}; is_push=${{env.is_no_push}} can_tag=${{ env.is_skip || env.is_no_push }} # can_tag
+          echo is_push=${{env.is_push}}; !is_push=${{env.is_no_push}}
+      - name: print can_deploy
+        run: |
+          echo can_deploy=${{ env.is_no_skip && env.is_push }} # can_tag
+      - name: print can_tag
+        run: |
+          echo !can_tag=${{ env.is_skip || env.is_no_push }} # !can_tag
 
   simple_deployment_pipeline:
     needs: [print_env]
@@ -80,4 +86,4 @@ jobs:
           # Should tag if pushed to master branch
           # and commit message does not contain #skip.
           # Since, this is a negation of can_deploy:
-          DRY_RUN: ${{ env.is_skip || env.is_no_push }} # can_tag
+          DRY_RUN: ${{ env.is_skip || env.is_no_push }} # !can_tag
