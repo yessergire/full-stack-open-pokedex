@@ -1,5 +1,9 @@
 name: Deployment pipeline
 
+env:
+  commits: ${{ join(github.event.commits.*.message) }}
+  skip: ${{ contains(join(github.event.commits.*.message), '#skip') }}
+
 on:
   push:
     branches:
@@ -9,22 +13,30 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  simple_deployment_pipeline:
+  print:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
-      - name: install node
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-      - name: npm install
-        run: npm install
-      - name: lint
-        run: npm run lint
+      - name: print env
+        run: |
+          echo commits ${{ env.commits }}
+          echo must skip ${{ env.skip }}
+
+  # simple_deployment_pipeline:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: install node
+  #       uses: actions/setup-node@v2
+  #       with:
+  #         node-version: '16'
+  #     - name: npm install
+  #       run: npm install
+  #     - name: lint
+  #       run: npm run lint
       # - name: build
       #   run: npm run build
-      - name: test
-        run: npm run test
+  #     - name: test
+  #       run: npm run test
       # - name: e2e tests
       #  uses: cypress-io/github-action@v4
       #  with:
@@ -43,7 +55,7 @@ jobs:
       #     rollbackonhealthcheckfailed: true
 
   tag_release:
-    needs: [simple_deployment_pipeline]
+    #needs: [simple_deployment_pipeline]
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
