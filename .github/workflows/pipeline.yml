@@ -18,20 +18,24 @@ on:
 
 jobs:
   print_env:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: print is_skip
-        run: echo is_skip=${{ env.is_skip }} !is_skip=${{ env.is_no_skip }}
+        run: |
+          echo is_skip=${{ env.is_skip }} !is_skip=${{ env.is_no_skip }}
       - name: print is_push
-        run: echo is_push=${{ env.is_push }} !is_push=${{ env.is_no_push }}
+        run: |
+          echo is_push=${{ env.is_push }} !is_push=${{ env.is_no_push }}
       - name: print can_deploy
-        run: echo can_deploy=${{ env.is_no_skip && env.is_push }}
+        run: |
+          echo can_deploy=${{ env.is_no_skip && env.is_push }}
       - name: print can_tag
-        run: echo !can_tag=${{ env.is_skip || env.is_no_push }}
+        run: |
+          echo !can_tag=${{ env.is_skip || env.is_no_push }}
 
   simple_deployment_pipeline:
     needs: [print_env]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: install node
@@ -68,7 +72,7 @@ jobs:
 
   tag_release:
     needs: [simple_deployment_pipeline]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
