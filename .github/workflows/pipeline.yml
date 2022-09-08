@@ -2,10 +2,9 @@ name: Deployment pipeline
 
 env:
   commits: ${{ join(github.event.commits.*.message) }}
+  # Does a commit message contain #skip?
   is_skip: ${{ contains(join(github.event.commits.*.message), '#skip') }}
   is_push: ${{ github.event_name == 'push' }}
-  can_deploy: ${{ !env.is_skip && env.is_push }}
-  should_tag: ${{ env.can_deploy }}
 
 on:
   push:
@@ -39,7 +38,9 @@ jobs:
       #     start: npm run start-prod
       #     wait-on: http://localhost:5000
       - name: Deploy to Heroku
-        if: ${{ env.can_deploy }}
+        # Should deploy if pushed to master branch
+        # and commit message does not contain #skip
+        if: ${{ !env.is_skip && env.is_push }} # can_deploy
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
@@ -63,4 +64,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           DEFAULT_BUMP: patch
-          DRY_RUN: ${{ !env.should_tag }}
+          # Should tag if pushed to master branch
+          # and commit message does not contain #skip.
+          # Since, this is a negation of can_deploy:
+          DRY_RUN: ${{ env.is_skip || !env.is_push }}
