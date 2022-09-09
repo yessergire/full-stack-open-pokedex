@@ -17,7 +17,6 @@ on:
 
 jobs:
   build_and_test:
-    if: false
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -34,7 +33,6 @@ jobs:
       - name: test
         run: npm run test
       - name: e2e tests
-        if: false # skip this for now since it is too slow
         uses: cypress-io/github-action@v4
         with:
           start: npm run start-prod
@@ -42,7 +40,7 @@ jobs:
 
   deploy_to_heroku:
     if: (!contains(join(github.event.commits.*.message), '#skip') && github.event_name == 'push')
-    #needs: [build_and_test]
+    needs: [build_and_test]
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -59,8 +57,8 @@ jobs:
           rollbackonhealthcheckfailed: true
 
   tag_release:
-    # if: (!contains(join(github.event.commits.*.message), '#skip') && github.event_name == 'push')
-    #needs: [build_and_test]
+    if: (!contains(join(github.event.commits.*.message), '#skip') && github.event_name == 'push')
+    needs: [build_and_test]
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -73,4 +71,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           DEFAULT_BUMP: patch
-          DRY_RAN: ${{env.can_not_tag}}
