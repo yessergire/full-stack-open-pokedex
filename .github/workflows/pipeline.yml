@@ -10,6 +10,7 @@ on:
 
 jobs:
   build_and_test:
+    if: false
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -36,7 +37,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: print commit messages
-        if: env.EVENT_NAME =! 'push'
+        if: env.EVENT_NAME != 'push'
         run: echo ${{ env.COMMIT_MESSAGES }}
         env:
           COMMIT_MESSAGES: ${{ join(github.event.commits.*.message) }}
