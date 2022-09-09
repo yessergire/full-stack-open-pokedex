@@ -7,7 +7,11 @@ env:
   is_no_skip: ${{ !contains(join(github.event.commits.*.message), '#skip') }}
   is_push: ${{ github.event_name == 'push' }}
   is_no_push: ${{ github.event_name != 'push' }}
+
+  # Should deploy if pushed to master branch and commit message does not contain #skip
   can_deploy: ${{ !contains(join(github.event.commits.*.message), '#skip') && github.event_name == 'push' }}
+
+  # Should tag if it can deploy
   can_not_tag: ${{ contains(join(github.event.commits.*.message), '#skip') || github.event_name != 'push' }}
 
 on:
@@ -63,11 +67,10 @@ jobs:
     needs: [build_and_test]
     runs-on: ubuntu-20.04
     steps:
-      - name: Deploy to Heroku
-        # Should deploy if pushed to master branch
-        # and commit message does not contain #skip
+      - name: Can deploy?
         run: |
           echo will deploy: ${{ env.can_deploy }}
+      - name: Deploy to Heroku
         if: ${{ env.can_deploy }}
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
