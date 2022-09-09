@@ -44,8 +44,6 @@ jobs:
           checkstring: "ok"
           delay: 90
           rollbackonhealthcheckfailed: true
-      - name: print
-        run: echo '${{toJSON(github.event.commits[0].committer)}}'
 
   tag_release:
     if: github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip')
@@ -69,7 +67,7 @@ jobs:
     - name: Test Success
       #uses: rjstone/discord-webhook-notify@v1
       run: |
-        echo $text $env.description
+        echo $text $description
       if: success()
       env:
           text: A new version of Pokedex deployed
