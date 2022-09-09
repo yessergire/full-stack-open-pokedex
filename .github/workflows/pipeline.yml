@@ -60,7 +60,7 @@ jobs:
       #     wait-on: http://localhost:5000
 
   deploy_to_heroku:
-    if: env.can_deploy
+    if: ${{ env.can_deploy }}
     needs: [build_and_test]
     runs-on: ubuntu-20.04
     steps:
@@ -78,7 +78,7 @@ jobs:
           rollbackonhealthcheckfailed: true
 
   tag_release:
-    if: env.can_deploy
+    if: ${{ env.can_deploy }}
     needs: [build_and_test]
     runs-on: ubuntu-20.04
     steps:
