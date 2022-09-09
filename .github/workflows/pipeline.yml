@@ -58,10 +58,13 @@ jobs:
       #   with:
       #     start: npm run start-prod
       #     wait-on: http://localhost:5000
+      - name: Can deploy to Heroku?
+        run: |
+          echo Can deploy: ${{ toJSON(env.can_deploy) }}
       - name: Deploy to Heroku
         # Should deploy if pushed to master branch
         # and commit message does not contain #skip
-        if: toJSON(env.can_deploy)
+        if: env.can_deploy
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
