@@ -64,12 +64,13 @@ jobs:
       #     wait-on: http://localhost:5000
 
   deploy_to_heroku:
+    # can't access env? See https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability
+    if: (!contains(join(github.event.commits.*.message), '#skip') && github.event_name == 'push')
     needs: [build_and_test]
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - name: Deploy to Heroku
-        if: false
         run: |
           echo will deploy: ${{ env.can_deploy }}
         # uses: akhileshns/heroku-deploy@v3.12.12
@@ -83,6 +84,7 @@ jobs:
         #   rollbackonhealthcheckfailed: true
 
   tag_release:
+    if: (!contains(join(github.event.commits.*.message), '#skip') && github.event_name == 'push')
     needs: [build_and_test]
     runs-on: ubuntu-20.04
     steps:
@@ -90,7 +92,6 @@ jobs:
         with:
           fetch-depth: '0'
       - name: Bump version and push tag
-        if: false
         uses: anothrNick/github-tag-action@1.36.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
