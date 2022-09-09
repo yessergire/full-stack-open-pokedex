@@ -1,13 +1,10 @@
 name: Deployment pipeline
 
 env:
-  commits: ${{ join(github.event.commits.*.message) }}
-  # Does a commit message contain #skip?
-  is_skip: ${{ contains(join(github.event.commits.*.message), '#skip') }}
-  is_no_skip: ${{ !contains(join(github.event.commits.*.message), '#skip') }}
-  is_push: ${{ github.event_name == 'push' }}
-  is_no_push: ${{ github.event_name != 'push' }}
+  # Should deploy if pushed to master branch and commit message does not contain #skip
   can_deploy: ${{ !contains(join(github.event.commits.*.message), '#skip') && github.event_name == 'push' }}
+
+  # Should tag if it can deploy
   can_not_tag: ${{ contains(join(github.event.commits.*.message), '#skip') || github.event_name != 'push' }}
 
 on:
@@ -19,24 +16,8 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  print_env:
-    runs-on: ubuntu-20.04
-    steps:
-      - name: is_skip
-        run: |
-          echo is_skip=${{ toJSON(env.is_skip) }}
-      - name: is_push
-        run: |
-          echo is_push=${{ toJSON(env.is_push) }}
-      - name: can_deploy
-        run: |
-          echo can_deploy=${{ env.can_deploy }}
-      - name: can_not_tag
-        run: |
-          echo can_not_tag=${{ env.can_not_tag }}
-
-  simple_deployment_pipeline:
-    needs: [print_env]
+  build_and_test:
+    if: false
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -52,16 +33,21 @@ jobs:
         run: npm run build
       - name: test
         run: npm run test
-      # # skip this for now since it is too slow
-      # - name: e2e tests
-      #   uses: cypress-io/github-action@v4
-      #   with:
-      #     start: npm run start-prod
-      #     wait-on: http://localhost:5000
+      - name: e2e tests
+        if: false # skip this for now since it is too slow
+        uses: cypress-io/github-action@v4
+        with:
+          start: npm run start-prod
+          wait-on: http://localhost:5000
+
+  deploy_to_heroku:
+    if: (!contains(join(github.event.commits.*.message), '#skip') && github.event_name == 'push')
+    #needs: [build_and_test]
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
       - name: Deploy to Heroku
-        # Should deploy if pushed to master branch
-        # and commit message does not contain #skip
-        if: ${{ env.can_deploy }}
+        if: env.can_deploy
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
@@ -73,19 +59,18 @@ jobs:
           rollbackonhealthcheckfailed: true
 
   tag_release:
-    needs: [simple_deployment_pipeline]
+    # if: (!contains(join(github.event.commits.*.message), '#skip') && github.event_name == 'push')
+    #needs: [build_and_test]
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Bump version and push tag
+        if: env.can_not_tag
         uses: anothrNick/github-tag-action@1.36.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           DEFAULT_BUMP: patch
-          # Should tag if pushed to master branch
-          # and commit message does not contain #skip.
-          # Since, this is a negation of can_deploy:
-          DRY_RUN: ${{ env.can_not_tag }}
+          DRY_RAN: ${{env.can_not_tag}}
