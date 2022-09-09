@@ -9,7 +9,7 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  build_and_test:
+  simple_deployment_pipeline:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -44,7 +44,7 @@ jobs:
 
   tag_release:
     if: github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip')
-    needs: [build_and_test]
+    needs: [simple_deployment_pipeline]
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
