@@ -68,20 +68,19 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - name: Can deploy?
-        run: |
-          echo will deploy: ${{ env.can_deploy }}
       - name: Deploy to Heroku
         if: false
-        uses: akhileshns/heroku-deploy@v3.12.12
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "pokelol"
-          heroku_email: "yessergire.mohamed@outlook.com"
-          healthcheck: "https://pokelol.herokuapp.com/health"
-          checkstring: "ok"
-          delay: 90
-          rollbackonhealthcheckfailed: true
+        run: |
+          echo will deploy: ${{ env.can_deploy }}
+        # uses: akhileshns/heroku-deploy@v3.12.12
+        # with:
+        #   heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+        #   heroku_app_name: "pokelol"
+        #   heroku_email: "yessergire.mohamed@outlook.com"
+        #   healthcheck: "https://pokelol.herokuapp.com/health"
+        #   checkstring: "ok"
+        #   delay: 90
+        #   rollbackonhealthcheckfailed: true
 
   tag_release:
     needs: [build_and_test]
@@ -97,3 +96,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           DEFAULT_BUMP: patch
+          DRY_RUN: true
