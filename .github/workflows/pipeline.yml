@@ -45,7 +45,7 @@ jobs:
           delay: 90
           rollbackonhealthcheckfailed: true
       - name: print
-        run: echo ${{JSON(github.event.commits)}}
+        run: echo ${{toJSON(github.event.commits)}}
 
   tag_release:
     if: github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip')
