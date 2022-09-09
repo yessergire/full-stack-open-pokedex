@@ -1,24 +1,9 @@
 name: Hello World!
 
-env:
-  commits: ${{ join(github.event.commits.*.message) }}
-  # Does a commit message contain #skip?
-  is_skip: ${{ contains(join(github.event.commits.*.message), '#skip') }}
-  is_no_skip: ${{ !contains(join(github.event.commits.*.message), '#skip') }}
-  is_push: ${{ github.event_name == 'push' }}
-  is_no_push: ${{ github.event_name != 'push' }}
-  is_true: true
-  is_eval_true: ${{ true }}
-  is_false: false
-  is_eval_false: ${{ false }}
-
 on:
   push:
     branches:
       - master
-  pull_request:
-    branches: [master]
-    types: [opened, synchronize]
 
 jobs:
   hello_world_job:
@@ -33,25 +18,3 @@ jobs:
       - name: Directory content
         run: |
           ls -l
-
-  print_env_job:
-    runs-on: ubuntu-20.04
-    steps:
-      - name: is_skip
-        run: |
-          echo ${{env.is_skip}} !${{env.is_skip}}=${{!env.is_skip}}
-      - name: is_push
-        run: |
-          echo ${{env.is_push}} !${{env.is_push}}=${{!env.is_push}}
-      - name: is_true
-        run: |
-          echo ${{env.is_true}} !${{env.is_true}}=${{!env.is_true}}
-      - name: is_eval_true
-        run: |
-          echo ${{env.is_eval_true}} !${{env.is_eval_true}}=${{!env.is_eval_true}}
-      - name: is_false
-        run: |
-          echo ${{env.is_false}} !${{env.is_false}}=${{!env.is_false}}
-      - name: is_eval_false
-        run: |
-          echo ${{env.is_eval_false}} !${{env.is_eval_false}}=${{!env.is_eval_false}}
