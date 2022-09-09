@@ -44,6 +44,25 @@ jobs:
           checkstring: "ok"
           delay: 90
           rollbackonhealthcheckfailed: true
+      - name: Deploy Success
+        #uses: rjstone/discord-webhook-notify@v1
+        run: |
+          echo '${{env.text}} ${{env.description}}'
+        if: success() && github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip')
+        env:
+            text: A new version of Pokedex deployed
+            description: to https://pokelol.herokuapp.com by ${{join(github.event.commits[0].committer.username)}}.
+      - name: Error
+        #uses: rjstone/discord-webhook-notify@v1
+        run: |
+          echo '${{env.text}} ${{env.description}}'
+        if: failure()
+        env:
+            text: Build failed
+            description: |
+              commit ${{join(github.event.commits[0].url)}}
+              by ${{join(github.event.commits[0].committer.username)}}
+              broke the build :(
 
   tag_release:
     if: github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip')
@@ -59,27 +78,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           DEFAULT_BUMP: patch
-
-  send_notifications:
-    needs: [simple_deployment_pipeline]
-    runs-on: ubuntu-20.04
-    steps:
-    - name: Deploy Success
-      #uses: rjstone/discord-webhook-notify@v1
-      run: |
-        echo '${{env.text}} ${{env.description}}'
-      if: success() && github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip')
-      env:
-          text: A new version of Pokedex deployed
-          description: to https://pokelol.herokuapp.com by ${{join(github.event.commits[0].committer.username)}}.
-    - name: Error
-      #uses: rjstone/discord-webhook-notify@v1
-      run: |
-        echo '${{env.text}} ${{env.description}}'
-      if: failure()
-      env:
-          text: Build failed
-          description: |
-            commit ${{join(github.event.commits[0].url)}}
-            by ${{join(github.event.commits[0].committer.username)}}
-            broke the build :(
