@@ -69,7 +69,7 @@ jobs:
     - name: Test Success
       #uses: rjstone/discord-webhook-notify@v1
       run: |
-        echo ${{text}} ${{description}}
+        echo ${{env.text}} ${{env.description}}
       if: success()
       env:
           text: A new version of Pokedex deployed
