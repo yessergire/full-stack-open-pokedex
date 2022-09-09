@@ -16,6 +16,9 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize]
 
 jobs:
   hello_world_job:
@@ -30,6 +33,10 @@ jobs:
       - name: Directory content
         run: |
           ls -l
+
+  print_env_job:
+    runs-on: ubuntu-20.04
+    steps:
       - name: is_skip
         run: |
           echo ${{env.is_skip}} !${{env.is_skip}}=${{!env.is_skip}}
