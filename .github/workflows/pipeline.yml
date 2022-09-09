@@ -61,7 +61,7 @@ jobs:
       - name: Deploy to Heroku
         # Should deploy if pushed to master branch
         # and commit message does not contain #skip
-        if: (!contains(join(github.event.commits.*.message), '#skip') && github.event_name == 'push')
+        if: env.can_deploy
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
