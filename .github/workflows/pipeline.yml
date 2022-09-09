@@ -20,7 +20,7 @@ jobs:
       - name: npm install
         run: npm install
       - name: lint
-        run: npm run eslint
+        run: npm run lint
       - name: build
         if: github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip')
         run: npm run build
