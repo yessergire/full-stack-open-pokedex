@@ -35,7 +35,7 @@ jobs:
         run: |
           echo can_not_tag=${{ toJSON(env.can_not_tag) }}
 
-  simple_deployment_pipeline:
+  build_and_test:
     needs: [print_env]
     runs-on: ubuntu-20.04
     steps:
@@ -58,13 +58,15 @@ jobs:
       #   with:
       #     start: npm run start-prod
       #     wait-on: http://localhost:5000
-      - name: Can deploy to Heroku?
-        run: |
-          echo Can deploy: ${{ toJSON(env.can_deploy) }}
+
+  deploy_to_heroku:
+    if: env.can_deploy
+    needs: [build_and_test]
+    runs-on: ubuntu-20.04
+    steps:
       - name: Deploy to Heroku
         # Should deploy if pushed to master branch
         # and commit message does not contain #skip
-        if: env.can_deploy
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
@@ -76,7 +78,8 @@ jobs:
           rollbackonhealthcheckfailed: true
 
   tag_release:
-    needs: [simple_deployment_pipeline]
+    if: env.can_deploy
+    needs: [build_and_test]
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -88,6 +91,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           DEFAULT_BUMP: patch
-          # Should tag if pushed to master branch
-          # and commit message does not contain #skip.
-          DRY_RUN: ${{ env.can_not_tag }}
+
