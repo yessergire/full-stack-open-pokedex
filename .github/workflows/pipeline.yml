@@ -60,13 +60,15 @@ jobs:
       #     wait-on: http://localhost:5000
 
   deploy_to_heroku:
-    if: ${{ env.can_deploy }}
     needs: [build_and_test]
     runs-on: ubuntu-20.04
     steps:
       - name: Deploy to Heroku
         # Should deploy if pushed to master branch
         # and commit message does not contain #skip
+        run: |
+          echo will deploy: ${{ env.can_deploy }}
+        if: ${{ env.can_deploy }}
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
@@ -78,7 +80,6 @@ jobs:
           rollbackonhealthcheckfailed: true
 
   tag_release:
-    if: ${{ env.can_deploy }}
     needs: [build_and_test]
     runs-on: ubuntu-20.04
     steps:
@@ -86,9 +87,9 @@ jobs:
         with:
           fetch-depth: '0'
       - name: Bump version and push tag
+        if: env.can_deploy
         uses: anothrNick/github-tag-action@1.36.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           DEFAULT_BUMP: patch
-
