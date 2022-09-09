@@ -67,6 +67,7 @@ jobs:
     needs: [build_and_test]
     runs-on: ubuntu-20.04
     steps:
+      - uses: actions/checkout@v3
       - name: Can deploy?
         run: |
           echo will deploy: ${{ env.can_deploy }}
