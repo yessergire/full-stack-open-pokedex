@@ -67,7 +67,7 @@ jobs:
     - name: Deploy Success
       #uses: rjstone/discord-webhook-notify@v1
       run: |
-        echo ${{text}} ${{description}}
+        echo '${{env.text}} ${{env.description}}'
       if: success() && github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip')
       env:
           text: A new version of Pokedex deployed
@@ -75,7 +75,7 @@ jobs:
     - name: Error
       #uses: rjstone/discord-webhook-notify@v1
       run: |
-        echo ${{text}} ${{description}}
+        echo '${{env.text}} ${{env.description}}'
       if: failure()
       env:
           text: Build failed
