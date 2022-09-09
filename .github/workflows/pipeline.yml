@@ -30,10 +30,10 @@ jobs:
           echo is_push=${{ toJSON(env.is_push) }}
       - name: can_deploy
         run: |
-          echo can_deploy=${{ env.can_deploy }}
+          echo can_deploy=${{ toJSON(env.can_deploy) }}
       - name: can_not_tag
         run: |
-          echo can_not_tag=${{ env.can_not_tag }}
+          echo can_not_tag=${{ toJSON(env.can_not_tag) }}
 
   simple_deployment_pipeline:
     needs: [print_env]
@@ -87,4 +87,4 @@ jobs:
           DEFAULT_BUMP: patch
           # Should tag if pushed to master branch
           # and commit message does not contain #skip.
-          DRY_RUN: env.can_not_tag
+          DRY_RUN: ${{ env.can_not_tag }}
