@@ -20,7 +20,7 @@ jobs:
       - name: npm install
         run: npm install
       - name: lint
-        run: npm run lint
+        run: npm run eslint
       - name: build
         if: github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip')
         run: npm run build
@@ -64,11 +64,22 @@ jobs:
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-20.04
     steps:
-    - name: Test Success
+    - name: Deploy Success
       #uses: rjstone/discord-webhook-notify@v1
       run: |
-        echo $text $description
-      if: success()
+        echo ${{text}} ${{description}}
+      if: success() && github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip')
       env:
           text: A new version of Pokedex deployed
           description: to https://pokelol.herokuapp.com by ${{join(github.event.commits[0].committer.username)}}.
+    - name: Error
+      #uses: rjstone/discord-webhook-notify@v1
+      run: |
+        echo ${{text}} ${{description}}
+      if: failure()
+      env:
+          text: Build failed
+          description: |
+            commit ${{join(github.event.commits[0].url)}}
+            by ${{join(github.event.commits[0].committer.username)}}
+            broke the build :(
