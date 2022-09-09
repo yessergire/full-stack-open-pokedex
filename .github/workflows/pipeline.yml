@@ -22,11 +22,14 @@ jobs:
       - name: lint
         run: npm run lint
       - name: build
+        if: github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip')
         run: npm run build
       - name: test
+        if: github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip')
         run: npm run test
       - name: e2e tests
         uses: cypress-io/github-action@v4
+        if: github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip')
         with:
           start: npm run start-prod
           wait-on: http://localhost:5000
@@ -41,6 +44,8 @@ jobs:
           checkstring: "ok"
           delay: 90
           rollbackonhealthcheckfailed: true
+      - name: print
+        run: echo ${{JSON(github.event.commits)}}
 
   tag_release:
     if: github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip')
@@ -56,3 +61,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           DEFAULT_BUMP: patch
+
+  send_notifications:
+    needs: [simple_deployment_pipeline]
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Test Success
+      #uses: rjstone/discord-webhook-notify@v1
+      run: |
+        echo ${{text}} ${{description}}
+      if: success()
+      env:
+          text: A new version of Pokedex deployed
+          description: to https://pokelol.herokuapp.com by ...
