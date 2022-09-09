@@ -22,29 +22,16 @@ jobs:
       - name: lint
         run: npm run lint
       - name: build
-        if: false
         run: npm run build
       - name: test
-        if: false
         run: npm run test
       - name: e2e tests
-        if: false
         uses: cypress-io/github-action@v4
         with:
           start: npm run start-prod
           wait-on: http://localhost:5000
-
-  deploy_to_heroku:
-    needs: [build_and_test]
-    runs-on: ubuntu-20.04
-    steps:
-      - name: print commit messages
-        if: env.EVENT_NAME != 'push'
-        run: echo ${{ env.COMMIT_MESSAGES }}
-        env:
-          COMMIT_MESSAGES: ${{ join(github.event.commits.*.message) }}
       - name: Deploy to Heroku
-        if: (!contains(join(github.event.commits.*.message), '#skip') && github.event_name == 'push')
+        if: github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip')
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
@@ -56,7 +43,7 @@ jobs:
           rollbackonhealthcheckfailed: true
 
   tag_release:
-    if: true #(github.event_name == 'push')
+    if: github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip')
     needs: [build_and_test]
     runs-on: ubuntu-20.04
     steps:
@@ -64,7 +51,6 @@ jobs:
         with:
           fetch-depth: '0'
       - name: Bump version and push tag
-        if: (!contains(join(github.event.commits.*.message), '#skip'))
         uses: anothrNick/github-tag-action@1.36.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
