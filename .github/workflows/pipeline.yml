@@ -71,8 +71,8 @@ jobs:
         run: |
           echo will deploy: ${{ env.can_deploy }}
       - name: Deploy to Heroku
-        if: ${{ env.can_deploy }}
         uses: akhileshns/heroku-deploy@v3.12.12
+        if: env.can_deploy
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: "pokelol"
@@ -90,8 +90,8 @@ jobs:
         with:
           fetch-depth: '0'
       - name: Bump version and push tag
-        if: env.can_deploy
         uses: anothrNick/github-tag-action@1.36.0
+        if: env.can_deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
