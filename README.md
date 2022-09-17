@@ -1,4 +1,5 @@
 # Full Stack open CI/CD
+[![codecov](https://codecov.io/gh/yessergire/full-stack-open-pokedex/branch/master/graph/badge.svg?token=4O2FWH1C9B)](https://codecov.io/gh/yessergire/full-stack-open-pokedex)
 
 This repository is used for the CI/CD module of the Full stack open course
 
