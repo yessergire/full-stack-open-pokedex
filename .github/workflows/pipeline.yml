@@ -22,14 +22,16 @@ jobs:
       - name: lint
         run: npm run lint
       - name: build
-        if: github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip')
         run: npm run build
       - name: test
-        if: github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip')
-        run: npm run test
+        run: npm test
+      - uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+          files: ./coverage/cobertura-coverage.xml
       - name: e2e tests
         uses: cypress-io/github-action@v4
-        if: github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip')
         with:
           start: npm run start-prod
           wait-on: http://localhost:5000
