@@ -52,6 +52,8 @@ jobs:
         with:
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
           text: A new version of Pokedex deployed
+          severity: info
+          avatarUrl: https://avatars.githubusercontent.com/${{join(github.event.commits[0].committer.username)}}
           description: to https://pokelol.herokuapp.com by ${{join(github.event.commits[0].committer.username)}}.
       - name: Error
         uses: rjstone/discord-webhook-notify@v1
@@ -59,6 +61,8 @@ jobs:
         with:
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
           text: Build failed
+          severity: error
+          avatarUrl: https://avatars.githubusercontent.com/${{join(github.event.commits[0].committer.username)}}
           description: |
             commit ${{join(github.event.commits[0].url)}}
             by ${{join(github.event.commits[0].committer.username)}}
